@@ -100,8 +100,8 @@ def to_machine_readable(data_frame, service_list, flag_list, test=False, save=Tr
     attr_name = ['duration', '', '', '', 'src_bytes', 'dst_bytes']
     for i in [0, 4, 5]:
         print('Converting {0} data (index {1}) to machine readable...'.format(attr_name[i], i))
-        iqr = (num_desc[i].values[6] - num_desc[i].values[4]) * 1.5
-        std = num_desc[i].values[5] + iqr
+        iqr = (num_desc[i].values[6] - num_desc[i].values[4])
+        std = num_desc[i].values[6] + iqr * 1.5  # IQR upper fence = Q3 + 1.5 * IQR
         if std == 0:
             df[i] = df[i].map(lambda x: 1 if x > 0 else 0)
         else:
@@ -109,7 +109,7 @@ def to_machine_readable(data_frame, service_list, flag_list, test=False, save=Tr
     sc.fit(df[[0, 4, 5]].values)
     df[[0, 4, 5]] = sc.transform(df[[0, 4, 5]].values)
 
-    # index 22, 31, 32: count, dst_host_count, dst_host_src_count (in kyoto: index 4, 8, 9)
+    # index 22, 31, 32: count, dst_host_count, dst_host_srv_count (in kyoto: index 4, 8, 9)
     print('Converting count data (index 22, 31, 32) to machine readable...')
     sc.fit(df[[22, 31, 32]].values.astype(np.float32))
     df[[22, 31, 32]] = sc.transform(df[[22, 31, 32]].values.astype(np.float32))
@@ -124,11 +124,10 @@ def to_machine_readable(data_frame, service_list, flag_list, test=False, save=Tr
     df.drop([1, 2, 3], axis=1, inplace=True)
     df_final = np.concatenate((df.values, one_hot_arr), axis=1)
 
-    # drop duplicates (deprecated)
-    # print('Before dropping duplicates: {0}'.format(df_final.shape))
+    print('Before dropping duplicates: {0}'.format(df_final.shape))
     df_final = pd.DataFrame(df_final)
-    # df_final.drop_duplicates(inplace=True)
-    # print('After dropping duplicates: {0}'.format(df_final.values.shape))
+    df_final.drop_duplicates(inplace=True)
+    print('After dropping duplicates: {0}'.format(df_final.values.shape))
 
     if save:
         if not os.path.exists('csv'):

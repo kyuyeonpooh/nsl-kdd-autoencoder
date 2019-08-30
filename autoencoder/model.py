@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 from keras.layers import Input, Dense, LeakyReLU, Dropout
 from keras.models import Model, load_model
 from keras.utils.io_utils import HDF5Matrix
@@ -15,14 +14,12 @@ import os
 import math
 
 
-# from AutoencoderIDS import AutoencoderIDS
-def myDisance(u, v):
+def my_distance(u, v):
     distance = 0.0
     u = u[0]
     v = v[0]
     for idx in range(u.shape[0]):
         distance += abs(u[idx] - v[idx])
-
     return distance
 
 
@@ -66,7 +63,7 @@ def deploy(makeCSV=True, makePlot=True):
         for idx in range(len(data_test)):
             input_test = data_test[idx].reshape((1, 114))
             predict_test = model.predict(input_test)
-            loss = myDisance(input_test, predict_test)
+            loss = my_distance(input_test, predict_test)
 
             atk_flag = False
             if loss > 1.0:
@@ -253,8 +250,7 @@ def autoencoder_mode():
     # decoder = Model(encoded_input, decoder_layer(encoded_input))
 
     print(autoencoder.summary())
-    autoencoder.compile(optimizer='rmsprop', loss='categorical_crossentropy')
-
+    autoencoder.compile(optimizer='rmsprop', loss='mean_absolute_error')
     autoencoder.fit(x_train, x_train,
                     epochs=6,
                     batch_size=64,
@@ -262,8 +258,7 @@ def autoencoder_mode():
                     validation_data=(x_validation, x_validation))
 
     autoencoder.save('autoencoder.h5')
-
     return
 
-#autoencoder_mode()
-deploy()
+# autoencoder_mode()  # Train mode
+deploy()  # Test mode
