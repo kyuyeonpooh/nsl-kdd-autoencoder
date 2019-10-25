@@ -167,13 +167,13 @@ def to_machine_readable(data_frame, service_list, flag_list, test=False, attack=
         if not attack:
             with h5py.File(os.path.join('..', 'hdf5', 'train_normal.hdf5'), 'w') as hdf:
                 print('Saving file:', os.path.join('..', 'hdf5', 'train_normal.hdf5'))
-                hdf['feature'] = df_final.values[:]
+                hdf['x'] = df_final.values[:]
         else:
             with h5py.File(os.path.join('..', 'hdf5', 'train_mix.hdf5'), 'w') as hdf:
                 print('Saving file:', os.path.join('..', 'hdf5', 'train_mix.hdf5'))
-                hdf['feature'] = df_final.values[:]
+                hdf['x'] = df_final.values[:]
     else:
         with h5py.File(os.path.join('..', 'hdf5', 'test.hdf5'), 'w') as hdf:
             print('Saving file:', os.path.join('..', 'hdf5', 'test.hdf5'))
-            hdf['feature'] = df_final.values[:]
-            hdf['label'] = df_label[:]
+            hdf['x'] = df_final.values[:]
+            hdf['y'] = df_label[:]
